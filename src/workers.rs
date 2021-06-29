@@ -23,22 +23,30 @@ async fn get_trades_for_pair(
 pub async fn main_worker(clients: Clients) {
     loop {
         tokio::time::sleep(Duration::from_millis(4000)).await;
+
         // Get trade data
         let clients = clients.clone();
-        tokio::task::spawn(async move {
-            let coin_pair = String::from("ETHBTC");
-            let trades = get_trades_for_pair(&coin_pair).await;
-            let trades = match trades {
-                Ok(v) => v,
-                Err(error) => {
-                    error!("get trades -> error occured: {}", error);
-                    return;
-                }
-            };
+        {
+            if clients.lock().await.len() > 0 {
+                tokio::task::spawn(async move {
+                    let coin_pair = String::from("ETHBTC");
+                    let trades = get_trades_for_pair(&coin_pair).await;
+                    let trades = match trades {
+                        Ok(v) => v,
+                        Err(error) => {
+                            error!("get trades -> error occured: {}", error);
+                            return;
+                        }
+                    };
 
-            let trades_data = data_types::Trades { coin_pair, trades };
+                    let trades_data = data_types::Trades { coin_pair, trades };
 
-            crypto_service::publish_message(trades_data, String::from("trades"), clients).await;
-        });
+                    crypto_service::publish_message(trades_data, String::from("trades"), clients)
+                        .await;
+                });
+            } else {
+                debug!("No clients connected: skipping data collection");
+            }
+        }
     }
 }
