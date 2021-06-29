@@ -9,10 +9,11 @@ use pretty_env_logger;
 #[macro_use]
 extern crate log;
 
+mod crypto_service;
+mod data_types;
 mod handler;
 mod workers;
 mod ws;
-
 #[derive(Debug, Clone)]
 pub struct Client {
     pub client_id: usize,
@@ -59,6 +60,10 @@ async fn main() {
         .or(ws_route)
         .or(publish_route)
         .with(warp::cors().allow_any_origin());
+
+    task::spawn(async move {
+        workers::main_worker(clients).await;
+    });
 
     warp::serve(routes).run(([127, 0, 0, 1], 8000)).await;
 }
