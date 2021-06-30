@@ -1,7 +1,6 @@
-use crate::{ws, Client, Clients, Result};
-use serde::{de, Deserialize, Deserializer, Serialize};
-use uuid::Uuid;
-use warp::{http::StatusCode, reply::json, ws::Message, Reply};
+use crate::Clients;
+use serde::Serialize;
+use warp::ws::Message;
 
 pub async fn publish_message<T: Serialize>(payload: T, channel: String, clients: Clients) {
     clients

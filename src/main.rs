@@ -1,8 +1,6 @@
 use std::{collections::HashMap, convert::Infallible, sync::Arc};
-
 use tokio::sync::{mpsc, Mutex};
 use tokio::task;
-use tokio::time::Duration;
 use warp::{ws::Message, Filter, Rejection};
 
 use pretty_env_logger;
@@ -10,10 +8,19 @@ use pretty_env_logger;
 extern crate log;
 
 mod crypto_service;
-mod data_types;
+mod binance {
+    pub mod models;
+    pub mod service;
+}
 mod handler;
+mod models;
+mod utils;
 mod workers;
 mod ws;
+mod coinbase {
+    pub mod models;
+    pub mod service;
+}
 #[derive(Debug, Clone)]
 pub struct Client {
     pub client_id: usize,

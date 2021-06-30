@@ -1,4 +1,5 @@
-use serde::{de, Deserialize, Deserializer, Serialize};
+use crate::utils::de_float_from_str;
+use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Serialize, Debug)]
 pub struct OrderBook {
@@ -19,18 +20,4 @@ pub struct Trade {
     time: u64,
     isBuyerMaker: bool,
     isBestMatch: bool,
-}
-
-#[derive(Debug, Deserialize, Serialize)]
-pub struct Trades {
-    pub coin_pair: String,
-    pub trades: Vec<Trade>,
-}
-
-fn de_float_from_str<'a, D>(deserializer: D) -> Result<f32, D::Error>
-where
-    D: Deserializer<'a>,
-{
-    let str_val = String::deserialize(deserializer)?;
-    str_val.parse::<f32>().map_err(de::Error::custom)
 }
