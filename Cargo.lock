@@ -911,8 +911,8 @@ dependencies = [
 ]
 
 [[package]]
-name = "rust-binance-client"
-version = "0.1.0"
+name = "rust-crypto-exchange-client"
+version = "0.3.1"
 dependencies = [
  "futures",
  "log",

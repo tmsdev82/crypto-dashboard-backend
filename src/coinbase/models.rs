@@ -11,3 +11,24 @@ pub struct Trade {
     time: String,
     side: String,
 }
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct RawOrderBook {
+    pub sequence: u64,
+    pub asks: Vec<(String, String, u32)>,
+    pub bids: Vec<(String, String, u32)>,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct OfferData {
+    pub price: f32,
+    pub size: f32,
+    pub num_orders: u32,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct OrderBookDTO {
+    pub sequence: u64,
+    pub asks: Vec<OfferData>,
+    pub bids: Vec<OfferData>,
+}

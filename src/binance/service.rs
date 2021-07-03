@@ -1,24 +1,93 @@
-use crate::{binance, ws, Client, Clients, Result};
-use reqwest;
-use reqwest::header;
-use serde::Serialize;
+use core::panic;
+
+use crate::{
+    binance, crypto_service,
+    models::{self, CoinPairData},
+};
 
 const BINANCE_API_URL: &str = "http://api.binance.com/api/v3";
 
-pub async fn binance_get_trades_for_pair(
+pub async fn get_trades_for_pair(
     crypto_pair: &str,
 ) -> std::result::Result<
     Vec<binance::models::Trade>,
     Box<dyn std::error::Error + Send + Sync + 'static>,
 > {
-    let trade_root_url = format!("{}/trades", BINANCE_API_URL);
-    let trades_url = format!("{}?symbol={}&limit=5", trade_root_url, crypto_pair);
+    let root_url = format!("{}/trades", BINANCE_API_URL);
+    let query_url = format!("{}?symbol={}&limit=10", root_url, crypto_pair);
 
-    let response = reqwest::get(trades_url)
-        .await?
-        .json::<Vec<binance::models::Trade>>()
-        .await?;
+    let response: Vec<binance::models::Trade> =
+        crypto_service::get_data_from_exchange(&query_url).await?;
 
-    // response
+    Ok(response)
+}
+
+pub async fn get_trades_data_for_pair(
+    coin_pair: &str,
+) -> models::CoinPairData<Vec<binance::models::Trade>> {
+    let exchange_name = "binance";
+    let data_type = "trades";
+    let trades = get_trades_for_pair(&coin_pair).await.unwrap();
+
+    let trades_data = models::CoinPairData::<Vec<binance::models::Trade>> {
+        coin_pair: String::from(coin_pair),
+        data_set: trades,
+        data_type: String::from(data_type),
+        exchange_name: String::from(exchange_name),
+    };
+
+    trades_data
+}
+
+fn RawToOfferData(raw: &Vec<[String; 2]>) -> Vec<binance::models::OfferData> {
+    raw.iter()
+        .map(|item| binance::models::OfferData {
+            price: item[0].parse().unwrap(),
+            size: item[1].parse().unwrap(),
+        })
+        .collect()
+}
+
+pub async fn get_orderbooks_data_for_pair(
+    coin_pair: &str,
+) -> models::CoinPairData<binance::models::OrderBookDTO> {
+    let exchange_name = "binance";
+    let data_type = "orderbooks";
+    let result = get_orderbooks_for_pair(&coin_pair).await;
+    let orderbooks = match result {
+        Ok(v) => v,
+        Err(e) => {
+            error!("error occurred: {}", e);
+            panic!("error occured");
+        }
+    };
+
+    let orderbooks = binance::models::OrderBookDTO {
+        lastUpdateId: orderbooks.lastUpdateId,
+        asks: RawToOfferData(&orderbooks.asks),
+        bids: RawToOfferData(&orderbooks.bids),
+    };
+
+    let orderbook_data = models::CoinPairData::<binance::models::OrderBookDTO> {
+        coin_pair: String::from(coin_pair),
+        data_set: orderbooks,
+        data_type: String::from(data_type),
+        exchange_name: String::from(exchange_name),
+    };
+
+    orderbook_data
+}
+
+pub async fn get_orderbooks_for_pair(
+    crypto_pair: &str,
+) -> std::result::Result<
+    binance::models::RawOrderBook,
+    Box<dyn std::error::Error + Send + Sync + 'static>,
+> {
+    let root_url = format!("{}/depth", BINANCE_API_URL);
+    let query_url = format!("{}?symbol={}&limit=10", root_url, crypto_pair);
+    let response: binance::models::RawOrderBook =
+        crypto_service::get_data_from_exchange(&query_url).await?;
+
     Ok(response)
 }
