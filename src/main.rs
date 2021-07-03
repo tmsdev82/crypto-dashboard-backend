@@ -66,7 +66,12 @@ async fn main() {
         .or(register_routes)
         .or(ws_route)
         .or(publish_route)
-        .with(warp::cors().allow_any_origin());
+        .with(
+            warp::cors()
+                .allow_any_origin()
+                .allow_headers(vec!["content-type"])
+                .allow_methods(vec!["POST", "GET", "PUT", "DELETE", "OPTION"]),
+        );
 
     task::spawn(async move {
         workers::main_worker(clients).await;
