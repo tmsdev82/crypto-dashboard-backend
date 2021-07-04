@@ -1,6 +1,6 @@
 use crate::{coinbase, crypto_service, models};
 
-const COINBASE_API_URL: &str = "http://api.pro.coinbase.com";
+const COINBASE_API_URL: &str = "https://api.pro.coinbase.com";
 
 pub async fn get_trades_data_for_pair(
     coin_pair: &str,

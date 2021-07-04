@@ -5,7 +5,7 @@ use crate::{
     models::{self, CoinPairData},
 };
 
-const BINANCE_API_URL: &str = "http://api.binance.com/api/v3";
+const BINANCE_API_URL: &str = "https://api.binance.com/api/v3";
 
 pub async fn get_trades_for_pair(
     crypto_pair: &str,

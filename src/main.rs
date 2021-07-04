@@ -21,6 +21,11 @@ mod coinbase {
     pub mod models;
     pub mod service;
 }
+
+mod kraken {
+    pub mod models;
+    pub mod service;
+}
 #[derive(Debug, Clone)]
 pub struct Client {
     pub client_id: usize,
