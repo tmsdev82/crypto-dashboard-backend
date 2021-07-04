@@ -39,7 +39,7 @@ pub async fn get_trades_data_for_pair(
     trades_data
 }
 
-fn RawToOfferData(raw: &Vec<[String; 2]>) -> Vec<binance::models::OfferData> {
+fn raw_to_offer_data(raw: &Vec<[String; 2]>) -> Vec<binance::models::OfferData> {
     raw.iter()
         .map(|item| binance::models::OfferData {
             price: item[0].parse().unwrap(),
@@ -64,8 +64,8 @@ pub async fn get_orderbooks_data_for_pair(
 
     let orderbooks = binance::models::OrderBookDTO {
         lastUpdateId: orderbooks.lastUpdateId,
-        asks: RawToOfferData(&orderbooks.asks),
-        bids: RawToOfferData(&orderbooks.bids),
+        asks: raw_to_offer_data(&orderbooks.asks),
+        bids: raw_to_offer_data(&orderbooks.bids),
     };
 
     let orderbook_data = models::CoinPairData::<binance::models::OrderBookDTO> {
@@ -85,7 +85,7 @@ pub async fn get_orderbooks_for_pair(
     Box<dyn std::error::Error + Send + Sync + 'static>,
 > {
     let root_url = format!("{}/depth", BINANCE_API_URL);
-    let query_url = format!("{}?symbol={}&limit=10", root_url, crypto_pair);
+    let query_url = format!("{}?symbol={}&limit=50", root_url, crypto_pair);
     let response: binance::models::RawOrderBook =
         crypto_service::get_data_from_exchange(&query_url).await?;
 

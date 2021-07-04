@@ -32,7 +32,7 @@ pub async fn get_trades_for_pair(
     Ok(response)
 }
 
-fn RawToOfferData(raw: &Vec<(String, String, u32)>) -> Vec<coinbase::models::OfferData> {
+fn raw_offer_data(raw: &Vec<(String, String, u32)>) -> Vec<coinbase::models::OfferData> {
     raw.iter()
         .map(|item| coinbase::models::OfferData {
             price: item.0.parse().unwrap(),
@@ -51,8 +51,8 @@ pub async fn get_orderbooks_data_for_pair(
 
     let orderbooks = coinbase::models::OrderBookDTO {
         sequence: orderbooks.sequence,
-        asks: RawToOfferData(&orderbooks.asks),
-        bids: RawToOfferData(&orderbooks.bids),
+        asks: raw_offer_data(&orderbooks.asks),
+        bids: raw_offer_data(&orderbooks.bids),
     };
 
     let orderbook_data = models::CoinPairData::<coinbase::models::OrderBookDTO> {
@@ -72,7 +72,7 @@ pub async fn get_orderbooks_for_pair(
     Box<dyn std::error::Error + Send + Sync + 'static>,
 > {
     let root_url = format!("{}/products/{}/book", COINBASE_API_URL, crypto_pair);
-    let query_url = format!("{}?limit=10", root_url);
+    let query_url = format!("{}?level=2", root_url);
 
     let response: coinbase::models::RawOrderBook =
         crypto_service::get_data_from_exchange(&query_url).await?;
