@@ -1,4 +1,4 @@
-use crate::{binance, coinbase, crypto_service, kraken, Clients};
+use crate::{binance, coinbase, crypto_service, kraken, models, Clients};
 use tokio;
 use tokio::time::Duration;
 
@@ -10,6 +10,20 @@ async fn binance_worker(clients: Clients) {
         let orderbooks_data = binance::service::get_orderbooks_data_for_pair("ETHBTC").await;
         crypto_service::publish_message(orderbooks_data, String::from("orderbooks"), &clients)
             .await;
+
+        let triangle_sets = binance::triangular::triangular_arbitrage().await;
+        let triangle_sets_data = models::TriangleSetsData {
+            data_type: String::from("triangle_arbitrage"),
+            exchange_name: String::from("binance"),
+            triangle_sets,
+        };
+
+        crypto_service::publish_message(
+            triangle_sets_data,
+            String::from("triangle_arbitrage"),
+            &clients,
+        )
+        .await;
     });
 }
 

@@ -11,6 +11,7 @@ mod crypto_service;
 mod binance {
     pub mod models;
     pub mod service;
+    pub mod triangular;
 }
 mod handler;
 mod models;

@@ -36,7 +36,11 @@ async fn register_client(id: String, client_id: usize, clients: Clients) {
         id,
         Client {
             client_id,
-            channels: vec![String::from("trades"), String::from("orderbooks")],
+            channels: vec![
+                String::from("trades"),
+                String::from("orderbooks"),
+                String::from("triangle_arbitrage"),
+            ],
             sender: None,
         },
     );

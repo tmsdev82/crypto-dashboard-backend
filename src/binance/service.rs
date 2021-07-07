@@ -39,7 +39,7 @@ pub async fn get_trades_data_for_pair(
     trades_data
 }
 
-fn raw_to_offer_data(raw: &Vec<[String; 2]>) -> Vec<binance::models::OfferData> {
+pub fn raw_to_offer_data(raw: &Vec<[String; 2]>) -> Vec<binance::models::OfferData> {
     raw.iter()
         .map(|item| binance::models::OfferData {
             price: item[0].parse().unwrap(),
