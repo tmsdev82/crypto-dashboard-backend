@@ -4,6 +4,18 @@ This project is a basic foundation for a websocket enabled backend using the war
 
 ## Using
 
+The backend can be started with the cargo command:
+
+```bash
+cargo run
+```
+
+Logging is on `INFO` level by default. To show `DEBUG` level logging start with the following command:
+
+```bash
+RUST_LOG=debug cargo run
+```
+
 A health check can be done by doing a HTTP GET request on the `health` endpoint:
 
 ```bash
